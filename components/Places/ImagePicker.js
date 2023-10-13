@@ -7,8 +7,9 @@ import {
   PermissionStatus,
 } from "expo-image-picker";
 import { Colors } from "../../constants/colors";
+import OutlinedButton from "../UI/OutlinedButton";
 
-const ImagePicker = () => {
+const ImagePicker = ({ onTakeImage }) => {
   const [pickedImage, setPickedImage] = useState();
 
   const [cameraPermissionInformation, requestPermission] =
@@ -23,7 +24,7 @@ const ImagePicker = () => {
 
     if (cameraPermissionInformation.status === PermissionStatus.DENIED) {
       Alert.alert(
-        "Insuficcient Permissions! You need to grand permission to use this app, bitch."
+        "Insuficcient Permissions! You need to grant permission to use this app, bitch."
       );
 
       return false;
@@ -31,9 +32,6 @@ const ImagePicker = () => {
 
     return true;
   };
-
-  //TRIED TO MAKE image VARIABLE GLOBAL BUT DIDN'T WORK
-  //   let image;
 
   const takeImageHandler = async () => {
     const hasPermission = await verifyPermission();
@@ -48,47 +46,22 @@ const ImagePicker = () => {
       quality: 0.5,
     });
 
-    // THE ERROR IS THAT THE IMAGE URI FROM image IS UNDEFINED AND THUS CAN'T BE DISPLAYED
-
-    // console.log(image.uri);
-    // console.log(image);
-    // console.log(image.assets.uri);
-    // console.log(pickedImage);
-    // console.log(pickedImage.uri);
-
-    // const imageUri = image.uri;
-
-    // THIS CODE IS FOR SETTING STATE OF THE PICKED IMAGE
-    // setPickedImage(imageUri);
-
-    //CODE FOR SIMULATING THE PICKED IMAGE
-    setPickedImage(image);
-    // console.log(image.assets.uri);
-    // console.log(pickedImage);
+    setPickedImage(image.assets[0].uri);
+    onTakeImage(image.assets[0].uri);
   };
 
   let imagePreview = <Text>No image taken yet.</Text>;
 
-  //CODE FOR SIMULATING THE PICKED IMAGE
   if (pickedImage) {
-    // console.log(pickedImage);
-    imagePreview = (
-      <Image
-        style={styles.image}
-        source={require("../../images/placeholder-image.png")}
-      />
-    );
+    imagePreview = <Image style={styles.image} source={{ uri: pickedImage }} />;
   }
-
-  //CODE FOR OUTPUTTING THE IMAGE FROM THE STATE
-  //   if (pickedImage) {
-  //     imagePreview = <Image style={styles.image} source={{ uri: pickedImage }} />;
-  //   }
 
   return (
     <View>
       <View style={styles.imagePreview}>{imagePreview}</View>
-      <Button title="Take Image" onPress={takeImageHandler} />
+      <OutlinedButton icon="camera" onPress={takeImageHandler}>
+        Take Image
+      </OutlinedButton>
     </View>
   );
 };
@@ -104,6 +77,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.primary100,
     borderRadius: 4,
+    overflow: "hidden",
   },
   image: {
     width: "100%",
