@@ -2,6 +2,7 @@ import { Alert, Image, StyleSheet, View } from "react-native";
 import OutlinedButton from "../UI/OutlinedButton";
 import { Colors } from "../../constants/colors";
 import {
+  Accuracy,
   PermissionStatus,
   getCurrentPositionAsync,
   useForegroundPermissions,
@@ -13,6 +14,7 @@ import {
   useRoute,
   useIsFocused,
 } from "@react-navigation/native";
+import { getMapPreview } from "../../util/location";
 
 const LocationPicker = ({ onPickLocation }) => {
   const [pickedLocation, setPickedLocation] = useState();
@@ -70,12 +72,22 @@ const LocationPicker = ({ onPickLocation }) => {
       return;
     }
 
-    const location = await getCurrentPositionAsync();
-    // console.log(location);
+    const location = await getCurrentPositionAsync({
+      accuracy: Accuracy.Lowest,
+    });
     setPickedLocation({
       lat: location.coords.latitude,
       lng: location.coords.longitude,
     });
+  };
+
+  const tempFunction = async () => {
+    // console.log(pickedLocation);
+    const location = await getCurrentPositionAsync({
+      accuracy: "lowest",
+    });
+    console.log("test");
+    // console.log(location);
   };
 
   const pickOnMapHandler = () => {
@@ -88,7 +100,7 @@ const LocationPicker = ({ onPickLocation }) => {
     locationPreview = (
       <Image
         style={styles.image}
-        source={require("../../images/placeholder-image.png")}
+        source={{ uri: getMapPreview(pickedLocation.lat, pickedLocation.lng) }}
       />
     );
   }
